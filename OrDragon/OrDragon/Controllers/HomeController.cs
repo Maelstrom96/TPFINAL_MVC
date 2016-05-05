@@ -1,4 +1,4 @@
-﻿using Oracle.DataAccess.Client;
+﻿using Oracle.ManagedDataAccess.Client;
 using OrDragon.Models;
 using System;
 using System.Collections.Generic;
