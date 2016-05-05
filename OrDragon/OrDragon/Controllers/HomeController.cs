@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Oracle.DataAccess.Client;
+using OrDragon.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,6 +12,8 @@ namespace OrDragon.Controllers
     {
         public ActionResult Index()
         {
+            OracleConnection conn = Connection.GetConnection();
+            conn.Open();
             return View();
         }
 
