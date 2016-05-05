@@ -12,8 +12,6 @@ namespace OrDragon.Controllers
     {
         public ActionResult Index()
         {
-            OracleConnection conn = Connection.GetConnection();
-            conn.Open();
             return View();
         }
 
