@@ -27,5 +27,10 @@ namespace OrDragon.Models
         {
             return new OracleConnection(GetConnectionString());
         }
+
+        public static User Login(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
