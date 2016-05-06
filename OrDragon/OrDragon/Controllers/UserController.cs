@@ -1,4 +1,5 @@
-﻿using OrDragon.Models;
+﻿using OrDragon.Exceptions;
+using OrDragon.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,27 @@ namespace OrDragon.Controllers
 {
     public class UserController : Controller
     {
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login(UserViewModel userViewModel)
+        {
+            User user = new Models.User(userViewModel);
+            try
+            {
+                user = Users.Login(user);
+                Session["user"] = user;
+            }
+            catch(InvalidLoginException ix)
+            {
+                
+            }
+            return Redirect(ControllerContext.HttpContext.Request.UrlReferrer.ToString());
+        }
 
         public ActionResult Register()
         {
@@ -21,30 +43,30 @@ namespace OrDragon.Controllers
         {
             if (ModelState.IsValid)
             {
-                //Users users = (Users)HttpRuntime.Cache["Users"];
-                //User foundUser = users.GetUserByName(userViewModel.Username);
-                //if (foundUser != null)
-                //    ModelState.AddModelError("UserName", "Ce nom d'usager existe déjà!");
-                //else
-                //{
-                //    User newUser = new User(userViewModel);
-                //    users.Add(newUser);
+                User user = new User(userViewModel);
+                try
+                {
+                    Users.Register(user);
+                }
+                catch(UsernameAlreadyUsedException ex)
+                {
+                    ModelState.AddModelError("UserName", "Ce nom d'usager existe déjà!");
+                    return View();
+                }
 
-                //    UserViewModel usv = new UserViewModel();
-                //    usv.Password = newUser.Password;
-                //    usv.ConfirmPassword = newUser.Password;
-                //    usv.Username = newUser.Username;
-                //    Login(usv);
+                var modal = new Modal();
+                modal.Title = "Votre enregistrement est complété";
+                modal.Message = "Vous pouvez à présent vous connecter à partir du boutton Login.";
+                TempData["Modal"] = modal; // Show popup
 
-                //    return RedirectToAction("Index", "Home"); // Atteindra jamais
-                //}
+                return RedirectToAction("Index", "Home");
             }
             return View();
         }
 
         public ActionResult LogOff()
         {
-            if ((User)Session["User"] != null)
+            if ((User)Session["User"] != null) // If current session is logged in and as a user object
             {
                 Session.Clear();
                 Session.Abandon(); // Delete current session

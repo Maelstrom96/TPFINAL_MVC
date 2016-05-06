@@ -8,7 +8,8 @@ namespace OrDragon.Models
 {
     public class Question
     {
-
+        public int Id { get; set; }
+        public String Text { get; set; }
     }
 
     public class Answer
