@@ -1,0 +1,23 @@
+﻿@if (Session["user"] != null)
+{
+    OrDragon.Models.User user = (OrDragon.Models.User)Session["user"];
+    using (Html.BeginForm("LogOff", "User", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li> <a href="" id="TimeOutDisplay" style="color:yellow;"></a></li>
+            <li>
+                @Html.ActionLink("Bonjour " + user.Name + " " + user.Lastname + "!", "Manage", "User", routeValues: null, htmlAttributes: new { title = "Administrer" })
+            </li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Se déconnecter</a></li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("S’inscrire", "Register", "User", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Se connecter", "Login", "User", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

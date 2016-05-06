@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OrDragon.Models
 {
-    public static class Connection
+    public static class Database
     {
         static private string DataSource = "(DESCRIPTION="
             + "(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)"
