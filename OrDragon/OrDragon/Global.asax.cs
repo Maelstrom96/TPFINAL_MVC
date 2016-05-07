@@ -18,9 +18,11 @@ namespace OrDragon
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            Questions questions = new Questions();
-            questions.Import();
+            //Questions questions = new Questions();
+            //questions.Import();
 
+            Map map = new Map();
+            map.GetFromServer();
         }
     }
 }
