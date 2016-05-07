@@ -160,9 +160,9 @@ namespace OrDragon.Models
 
                 loggedinUser.Id = Oraread.GetInt32(0);
                 loggedinUser.Username = Oraread.GetString(1);
-                loggedinUser.Password = Oraread.GetString(2);
-                loggedinUser.Name = Oraread.GetString(3);
-                loggedinUser.Lastname = Oraread.GetString(4);
+                loggedinUser.Name = Oraread.GetString(2);
+                loggedinUser.Lastname = Oraread.GetString(3);
+                loggedinUser.Password = Oraread.GetString(5);
             }            catch(OracleException ex)            {
                 OracleExceptions.Parse(ex);
             }            finally

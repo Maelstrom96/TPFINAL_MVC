@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrDragon.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,6 +17,10 @@ namespace OrDragon
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            Questions questions = new Questions();
+            questions.Import();
+
         }
     }
 }
