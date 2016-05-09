@@ -70,12 +70,13 @@ namespace OrDragon.Controllers
                 Session["user"] = user; // register user to session
 
                 status.Success = true;
-                status.Message = "Login attempt successful!";
+                status.Message = "Authentification réussie!";
+                status.TargetURL = ControllerContext.HttpContext.Request.UrlReferrer.ToString();
             }
             catch (InvalidLoginException ix)
             {
                 status.Success = false;
-                status.Message = "Invalid UserID or Password!";
+                status.Message = "Identifiants invalides";
                 status.TargetURL = null;
             }
 

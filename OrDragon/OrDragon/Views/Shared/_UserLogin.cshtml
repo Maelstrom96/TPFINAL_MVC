@@ -20,10 +20,11 @@ else
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
             <ul id="login-dp" class="dropdown-menu">
+                <div id="log-message"></div>
                 <li>
                     <div class="row">
                         <div class="col-md-12">
-                            <form class="form" role="form" method="post" action="/user/login" accept-charset="UTF-8" id="login-nav">
+                            <form class="form" role="form" method="post" accept-charset="UTF-8" id="login-nav">
                                 @Html.AntiForgeryToken()
                                 <div class="form-group">
                                     <label class="sr-only" for="exampleInputEmail2">Nom d'utilisateur</label>
@@ -34,7 +35,7 @@ else
                                     <input type="password" class="form-control" id="Password" name="Password" placeholder="Mot de passe" required>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-block">S'authentifier</button>
+                                    <button id="btn-login" type="submit" class="btn btn-primary btn-block">S'authentifier</button>
                                 </div>
                             </form>
                         </div>
@@ -46,4 +47,48 @@ else
             </ul>
         </li>
     </ul>
+    
+    <script>
+        $("#login-nav").submit(function (e) {
+            e.preventDefault();
+        });
+
+        $(document).ready(function () {
+            $("#btn-login").click(function () {
+                $("#log-message").html("Logging in...");
+                $("#log-message").removeClass().addClass("alert alert-info");
+                var data = {
+                    "username": $("#Username").val(),
+                    "password": $("#Password").val()
+                };
+                $.ajax({
+                    url: "/user/validateuser",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (status) {
+                        if (status.Success)
+                        {
+                            $("#log-message").html(status.Message);
+                            $("#log-message").removeClass().addClass("alert alert-success");
+                            setTimeout(redirect.bind(null, status.TargetURL), 750);
+                        }
+                        else
+                        {
+                            $("#log-message").html(status.Message);
+                            $("#log-message").removeClass().addClass("alert alert-danger");
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $("#log-message").html(textStatus);
+                    }
+                });
+            });
+        });
+
+        function redirect(url) {
+            window.location.href = url;
+        }
+    </script>
 }
