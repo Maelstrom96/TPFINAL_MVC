@@ -18,11 +18,14 @@ namespace OrDragon
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            //Questions questions = new Questions();
-            //questions.Import();
+            Questions questions = new Questions();
+            questions.Import();
+            HttpRuntime.Cache["questions"] = questions;
 
             Map map = new Map();
             map.GetFromServer();
+            map.StartListener();
+            HttpRuntime.Cache["map"] = map;
         }
     }
 }

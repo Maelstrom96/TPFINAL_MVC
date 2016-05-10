@@ -171,6 +171,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MapController.cs" />
+    <Compile Include="Controllers\MapHub.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Exceptions\InvalidLoginException.cs" />
@@ -181,6 +183,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Database.cs" />
+    <Compile Include="Models\Game\Entity.cs" />
     <Compile Include="Models\Game\Map.cs" />
     <Compile Include="Models\Modal.cs" />
     <Compile Include="Models\Questions.cs" />
@@ -192,6 +195,15 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Images\Auberge.png" />
+    <Content Include="Content\Images\Chateau.png" />
+    <Content Include="Content\Images\Coin.png" />
+    <Content Include="Content\Images\Doritos.png" />
+    <Content Include="Content\Images\Gobelin.png" />
+    <Content Include="Content\Images\Joueur.png" />
+    <Content Include="Content\Images\Manoir.png" />
+    <Content Include="Content\Images\MountainDew.png" />
+    <Content Include="Content\Images\Troll.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -235,10 +247,11 @@
     <Content Include="Views\Shared\_UserLogin.cshtml" />
     <Content Include="Views\User\Register.cshtml" />
     <Content Include="Views\Shared\_Modal.cshtml" />
+    <Content Include="Views\Question\index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Question\" />
+    <Folder Include="Views\Map\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

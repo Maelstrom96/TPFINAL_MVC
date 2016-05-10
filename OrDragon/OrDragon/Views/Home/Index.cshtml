@@ -38,6 +38,60 @@
 <script>
     var stage;
     var bg;
+    var noeuds;
+    var chemins;
+    var entities
+
+    // Defining a connection to the server hub.
+    var myHub = $.connection.mapHub;
+    $.connection.hub.logging = true;
+    var queue = new createjs.LoadQueue();
+
+    queue.loadFile({ src: "/Content/Images/Joueur.png", id:"J"});
+    queue.loadFile({ src: "/Content/Images/Troll.png", id: "T" });
+    queue.loadFile({ src: "/Content/Images/Gobelin.png", id: "G" });
+    queue.loadFile({ src: "/Content/Images/Coin.png", id: "P" });
+    queue.loadFile({ src: "/Content/Images/MountainDew.png", id: "M" });
+    queue.loadFile({ src: "/Content/Images/Doritos.png", id: "D" });
+    queue.load();
+
+    $(function () {
+        //// Start the hub
+        window.hubReady = $.connection.hub.start();
+
+        myHub.client.sendEntities = function (message) {
+            for (var i in entities) {
+                stage.removeChild(entities[i].bitmap);
+            }
+
+            entities = new Array();
+            entities = message;
+
+            console.log(entities);
+
+            for (var i in entities) {
+                var image = queue.getResult(entities[i].Name);
+
+                var bitmap = new createjs.Bitmap(image);
+                entities[i].bitmap = bitmap;
+                stage.addChild(bitmap);
+
+                var tmp = entities[i].Noeud.Coordonates.split(',');
+
+                bitmap.x = tmp[0].trim();
+                bitmap.y = tmp[1].trim();
+            }
+        };
+    });
+
+    $.connection.hub.start().done(function () {
+        // Call the server side function AFTER the connection has been started
+        myHub.server.createUser();
+    })
+
+    $(document).ready(function () {
+        init();
+    });
 
     (function ($) {
         $(window).resize(function () {
@@ -45,30 +99,80 @@
         });
     })(jQuery);
 
-    window.onload = function () {
-        init();
-    };
-
     function init() {
         stage = new createjs.Stage("canvas");
+        stage.canvas.width = 1600;
+        stage.canvas.height = 900;
+
         bg = new createjs.Bitmap("http://prog101.com/travaux/dragon/images/carte02.png");
         stage.addChild(bg);
 
+        getInitChemins();
+
         createjs.Ticker.addEventListener("tick", tick);
         resize();
-
+        setTimeout(resize(), 1000);
     }
+
 
     function tick() {
         stage.update();
     }
 
+    function getInitChemins() {
+        noeuds = new Array();
+        $.getJSON("/Map/GetChemins", function (result) {
+            chemins = result;
+            console.log(chemins);
+
+            for (var i in chemins) {
+                var ligne_chemin = new createjs.Shape();
+
+                stage.addChild(ligne_chemin);
+
+                ligne_chemin.graphics.setStrokeStyle(3).beginStroke("rgba(0,0,0,1)");
+
+                ligne_chemin.graphics.moveTo(chemins[i].Noeud1.Coordonates.X, chemins[i].Noeud1.Coordonates.Y);
+                ligne_chemin.graphics.lineTo(chemins[i].Noeud2.Coordonates.X, chemins[i].Noeud2.Coordonates.Y);
+
+                ligne_chemin.graphics.endStroke;
+            }
+            
+            getInitNoeuds();
+        });
+    }
+
+    function getInitNoeuds() {
+        noeuds = new Array();
+        $.getJSON("/Map/GetNoeuds", function (result) {
+            noeuds = result;
+            console.log(noeuds);
+
+            for (var i in noeuds) {
+                var circle_noeud = new createjs.Graphics();
+                circle_noeud.setStrokeStyle(3);
+                circle_noeud.beginStroke(createjs.Graphics.getRGB(0, 0, 0));
+                if (noeuds[i].Buildable == true) circle_noeud.beginFill(createjs.Graphics.getRGB(0, 255, 0));
+                else circle_noeud.beginFill(createjs.Graphics.getRGB(255, 0, 0));
+                circle_noeud.drawCircle(0, 0, 10);
+
+                var s = new createjs.Shape(circle_noeud);
+                s.x = noeuds[i].Coordonates.X;
+                s.y = noeuds[i].Coordonates.Y;
+
+                noeuds[i].shape = s;
+
+                stage.addChild(s);
+            }
+        });
+    }
 
     function resize() {
-        stage.canvas.width = document.getElementById("gamemap").style.width;
-        stage.canvas.height = document.getElementById("gamemap").style.height;
-        bg.scaleX = stage.canvas.width / bg.image.width;
-        bg.scaley = stage.canvas.height / bg.image.height;
+        var tmpwidth = $("#gamemap").width();
+        var tmpheight = window.innerHeight;
+
+        stage.scaleX = tmpwidth / bg.image.width;
+        stage.scaleY = stage.scaleX;
     }
 
     //var c = new createjs.Shape();
