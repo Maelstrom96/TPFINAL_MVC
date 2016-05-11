@@ -37,6 +37,9 @@
     queue.loadFile({ src: "/Content/Images/Coin.png", id: "P" });
     queue.loadFile({ src: "/Content/Images/MountainDew.png", id: "M" });
     queue.loadFile({ src: "/Content/Images/Doritos.png", id: "D" });
+    queue.loadFile({ src: "/Content/Images/Auberge.png", id: "A" });
+    queue.loadFile({ src: "/Content/Images/Manoir.png", id: "N" });
+    queue.loadFile({ src: "/Content/Images/Chateau.png", id: "C" });
     queue.load();
 
     $(function () {
@@ -89,7 +92,7 @@
         stage.canvas.width = 1600;
         stage.canvas.height = 900;
 
-        bg = new createjs.Bitmap("http://prog101.com/travaux/dragon/images/carte02.png");
+        bg = new createjs.Bitmap("http://prog101.com/travaux/dragon/images/carte03.png");
         stage.addChild(bg);
 
         getInitChemins();
@@ -153,6 +156,13 @@
         });
     }
 
+    function inViewport($el) {
+        var elH = $el.outerHeight(),
+            H = $(window).height(),
+            r = $el[0].getBoundingClientRect(), t = r.top, b = r.bottom;
+        return Math.max(0, t > 0 ? Math.min(elH, H - t) : (b < H ? b : H));
+    }
+
     function resize() {
         var tmpwidth = $("#gamemap").width();
         var tmpheight = window.innerHeight;
@@ -162,6 +172,33 @@
 
         stage.canvas.width = tmpwidth;
         stage.canvas.height = stage.scaleY * 900;
+
+        /*
+        var tmpwidth = $("#gamemap").width();
+        var tmpheight = window.innerHeight;
+
+        var finalwidth;
+        var finalheight;
+
+        var viewheight = inViewport($('#gamemap'));
+
+        if (tmpheight > viewheight) {
+            scale = viewheight / bg.image.width;
+            finalwidth = scale * 1600;
+            finalheight = viewheight;
+        }
+        else {
+            scale = tmpwidth / bg.image.width;
+            finalwidth = tmpwidth;
+            finalheight = scale * 900;
+        }
+
+        stage.scaleX = scale;
+        stage.scaleY = scale;
+
+        stage.canvas.width = finalwidth;
+        stage.canvas.height = finalheight;
+        */
 
         //if (stage.scaleX > 1) $("#canvas").removeClass().addClass("big");
         //else $("#canvas").removeClass();
