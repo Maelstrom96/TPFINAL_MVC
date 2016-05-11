@@ -1,4 +1,6 @@
-﻿@model IEnumerable<OrDragon.Models.Question>
+﻿@using OrDragon.Models;
+@model IEnumerable<OrDragon.Models.Question>
+@{Questions questions = (Questions)HttpRuntime.Cache["questions"];}
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -8,7 +10,9 @@
         <th>
             @Html.DisplayNameFor(model => model.Text)
         </th>
-        <th></th>
+        <th>
+
+        </th>
     </tr>
 
 @foreach (var item in Model) {
