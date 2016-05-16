@@ -13,6 +13,7 @@ namespace OrDragon.Models
     {
         public int Id { get; set; }
         public String Text { get; set; }
+        public int Difficulty { get; set; }
         public List<Answer> Answers { get; set; }
         public Answer GoodAnswer { get; set; }
 
@@ -21,16 +22,55 @@ namespace OrDragon.Models
             Answers = new List<Answer>();
         }
 
-        public Question(int id, string text) : this()
+        public Question(int id, string text, int Diff) : this()
         {
             Id = id;
             Text = text;
+            Difficulty = Diff;
         }
 
         public void AddAnswer(Answer answer)
         {
             Answers.Add(answer);
             if (answer.IsGood) GoodAnswer = answer;
+        }
+
+        public void AddQuestionDB(OracleConnection con)
+        {
+            OracleCommand cmd = new OracleCommand("QuestionsPKG", con);
+            cmd.CommandText = "QuestionsPKG.CreateQuestion";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            OracleParameter Enonce = new OracleParameter("PEnoncer", OracleDbType.Varchar2);
+            Enonce.Value = Text;
+            Enonce.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(Enonce);
+
+            OracleParameter Diff = new OracleParameter("PDiff", OracleDbType.Int32);
+            Diff.Value = Difficulty;
+            Diff.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(Diff);
+
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = "CreateAnswer";
+
+            Enonce = new OracleParameter("PReponse", OracleDbType.Varchar2);
+            Enonce.Direction = ParameterDirection.Input;
+
+            Diff = new OracleParameter("PFlag", OracleDbType.Int32);
+            Diff.Direction = ParameterDirection.Input;
+            for (int i = 0; i < Answers.Count; ++i)
+            {
+                cmd.Parameters.Clear();
+                Enonce.Value = Answers[i].Text;
+                Diff.Value = Answers[i].Text;
+
+                cmd.Parameters.Add(Enonce);
+                cmd.Parameters.Add(Diff);
+
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 
@@ -78,8 +118,8 @@ namespace OrDragon.Models
                     if (tempQuestionID == -1 || tempQuestionID != Oraread.GetInt32(0))
                     {
                         if (currentQuestion != null) questions.Add(currentQuestion);
-                        currentQuestion = new Question(Oraread.GetInt32(0), Oraread.GetString(1));
-                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(2), Oraread.GetInt32(3)));
+                        currentQuestion = new Question(Oraread.GetInt32(0), Oraread.GetString(1), Oraread.GetInt32(2));
+                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4)));
                         tempQuestionID = currentQuestion.Id;
                     }
                     else
