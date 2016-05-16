@@ -99,5 +99,9 @@ namespace OrDragon.Models
                 conn.Close();
             }
         }
+        public List<Question> GetList()
+        {
+            return questions;
+        }
     }
 }
