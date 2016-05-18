@@ -21,6 +21,7 @@ namespace OrDragon.Controllers
         }
 
         // GET: Question/Create
+        [HttpGet]
         public ActionResult Create()
         {
             return View();

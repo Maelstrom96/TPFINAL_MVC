@@ -2,6 +2,7 @@
 using OrDragon.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,10 @@ namespace OrDragon.Models
     public class Question
     {
         public int Id { get; set; }
+        [Display(Name="Question")]
         public String Text { get; set; }
+        [Range(1,3)]
+        [Display(Name="Difficulty")]
         public int Difficulty { get; set; }
         public List<Answer> Answers { get; set; }
         public Answer GoodAnswer { get; set; }
@@ -73,17 +77,44 @@ namespace OrDragon.Models
             }
         }
     }
+    public class QuestionAnswerViewModel
+    {
+        public Question q;
+        public Answer a;
+        public Answer b;
+        public Answer c;
+        public Answer d;
+
+        public QuestionAnswerViewModel()
+        {
+            q = new Question();
+            a = new Answer();
+            b = new Answer();
+            c = new Answer();
+            d = new Answer();
+        }
+    }
 
     public class Answer
     {
+        [Display(Name="Answers")]
         public String Text { get; set; }
         public bool IsGood { get; set; }
 
+        public Answer()
+        {
+
+        }
         public Answer(String text, int isGood)
         {
             Text = text;
             if (isGood == 0) IsGood = false;
             else IsGood = true;
+        }
+
+        public void setIsGood(bool value)
+        {
+            IsGood = value;
         }
     }
 
@@ -124,7 +155,7 @@ namespace OrDragon.Models
                     }
                     else
                     {
-                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(2), Oraread.GetInt32(3)));
+                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4)));
                     }
                 }
 
