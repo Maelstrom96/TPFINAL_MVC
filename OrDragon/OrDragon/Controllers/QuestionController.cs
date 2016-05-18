@@ -24,7 +24,8 @@ namespace OrDragon.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            OrDragon.Models.QuestionAnswerViewModel question = new Models.QuestionAnswerViewModel();
+            return View(question);
         }
 
         // POST: Question/Create
@@ -34,7 +35,6 @@ namespace OrDragon.Controllers
             try
             {
                 // TODO: Add insert logic here
-
                 return RedirectToAction("Index");
             }
             catch
