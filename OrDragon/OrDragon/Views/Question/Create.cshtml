@@ -4,11 +4,75 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>Ajouter une question</h2>
 
-@using (Html.BeginForm())
-{
+
+<form class="form" data-toggle="validator" role="form" method="post" accept-charset="UTF-8" id="create-nav">
     @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label class="sr-only" for="exampleInputQuestion">Question : </label>
+        <input type="text" data-val="true" class="form-control" id="qtext" name="qtext" placeholder="Quelle est la pire marque de téléphone?" required>
+    </div>
+    <div class="form-group">
+        <table>
+            @Html.LabelFor(model => model.a.Text, htmlAttributes: new { @class = "control-label col-md-2" })
+            <tr>
+                <td class="col-md-8" style="width:98%">
+                    <input type="text" data-val="true" class="form-control" id="rep1" name="rep1" placeholder="Android" required>
+                </td>
+                <td><input type="radio" name="isGood" id="1" required/></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-8">
+                    <input type="text" data-val="true" class="form-control" id="rep2" name="rep2" placeholder="Iphone" required>
+                </td>
+                <td><input type="radio" name="isGood" id="2" required/></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-8">
+                    <input type="text" data-val="true" class="form-control" id="rep3" name="rep3" placeholder="Blackberry" required>
+                </td>
+                <td><input type="radio" name="isGood" id="3" required/></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-8">
+                    <input type="text" data-val="true" class="form-control" id="rep4" name="rep4" placeholder="Windows phone" required>
+                </td>
+                <td><input type="radio" name="isGood" id="4" required/></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.q.Difficulty, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div>
+            <input type="number" min="1" max="3" class="form-control" id="difficulty" name="difficulty" placeholder="1" required>
+        </div>
+        <div>
+            <button id="btn-create" type="submit" class="btn btn-primary btn-block">Ajouter</button>
+        </div>
+    </div>
+</form>
+
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Modal header</h3>
+    </div>
+    <div class="modal-body">
+        <p>One fine body…</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary">Save changes</button>
+    </div>
+</div>
+
+    @*@Html.AntiForgeryToken()
 
     <div class="form-horizontal">
         <h4>Question</h4>
@@ -67,25 +131,65 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-4">
-                <input type="submit" value="Create" class="btn btn-default" onclick="SendGoodAnswer" />
+                <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
     </div>
-}
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
 
-@section Scripts{
-    @Scripts.Render("~/bundles/jqueryval")
-    @{
-        <script>
-            function SendGoodAnswer() {
-                if (document.getElementById("a").checked) {
+}*@
 
-                }
-            }
-        </script>
-    }
-}
+<script>
+    $("#create-nav").submit(function (e) {
+            e.preventDefault();
+        });
+
+        $(document).ready(function () {
+            $("#btn-create").click(function () {
+                var data = {
+                    "qtext": $("#qtext").val(),
+                    "rep1": $("#rep1").val(),
+                    "rep2": $("#rep2").val(),
+                    "rep3": $("#rep3").val(),
+                    "rep4": $("#rep4").val(),
+                    "goodrep": $('input[type=radio][name=isGood]:checked').attr('id'),
+                    "difficulty": $("#difficulty").val()
+
+                };
+                $.ajax({
+                    url: "/question/create",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (status) {
+                        $('#myModal').modal('show');
+                        /*
+                        if (status.Success)
+                        {
+                            $("#log-message").html(status.Message);
+                            $("#log-message").removeClass().addClass("alert alert-success");
+                            setTimeout(redirect.bind(null, status.TargetURL), 750);
+                        }
+                        else
+                        {
+                            $("#log-message").html(status.Message);
+                            $("#log-message").removeClass().addClass("alert alert-danger");
+                        }
+                        */
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $("#log-message").html(textStatus);
+                    }
+                });
+            });
+        });
+
+        function redirect(url) {
+            window.location.href = url;
+        }
+</script>
+

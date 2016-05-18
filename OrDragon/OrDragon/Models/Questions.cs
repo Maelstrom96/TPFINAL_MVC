@@ -13,8 +13,10 @@ namespace OrDragon.Models
     public class Question
     {
         public int Id { get; set; }
+        [Required]
         [Display(Name="Question")]
         public String Text { get; set; }
+        [Required]
         [Range(1,3)]
         [Display(Name="Difficulty")]
         public int Difficulty { get; set; }
@@ -39,8 +41,9 @@ namespace OrDragon.Models
             if (answer.IsGood) GoodAnswer = answer;
         }
 
-        public void AddQuestionDB(OracleConnection con)
+        public void AddQuestionDB()
         {
+            OracleConnection con = Database.GetConnection();
             OracleCommand cmd = new OracleCommand("QuestionsPKG", con);
             cmd.CommandText = "QuestionsPKG.CreateQuestion";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -97,7 +100,8 @@ namespace OrDragon.Models
 
     public class Answer
     {
-        [Display(Name="Answers")]
+        [Required]
+        [Display(Name="Réponse")]
         public String Text { get; set; }
         public bool IsGood { get; set; }
 
@@ -110,6 +114,12 @@ namespace OrDragon.Models
             Text = text;
             if (isGood == 0) IsGood = false;
             else IsGood = true;
+        }
+
+        public Answer(String text, bool isGood_)
+        {
+            Text = text;
+            IsGood = isGood_;
         }
 
         public void setIsGood(bool value)

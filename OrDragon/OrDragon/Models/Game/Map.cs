@@ -43,7 +43,7 @@ namespace OrDragon.Models
             noeuds.Clear();
 
                 // Data buffer for incoming data.
-            byte[] bytes = new byte[2048];
+            byte[] bytes = new byte[20480];
             String data = String.Empty;
 
             // Connect to a remote device.
