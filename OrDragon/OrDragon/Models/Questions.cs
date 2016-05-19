@@ -117,9 +117,15 @@ namespace OrDragon.Models
             cmd.Parameters.Add(Id);
 
             OracleDataAdapter adapt = new OracleDataAdapter(cmd);
-            con.Open();
-            adapt.Fill(data, "Question");
-            con.Close();
+            try {
+                con.Open();
+                adapt.Fill(data, "Question");
+                con.Close();
+            }
+            catch (Exception e)
+            {
+
+            }
             return data;
         }
 

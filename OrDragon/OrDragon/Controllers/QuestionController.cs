@@ -20,6 +20,8 @@ namespace OrDragon.Controllers
         // GET: Question/Details/5
         public ActionResult Details(int id)
         {
+            Question c = new Question();
+            System.Data.DataSet data = c.GetQuestionById(88);
             return View();
         }
 
@@ -118,6 +120,9 @@ namespace OrDragon.Controllers
         // GET: Question/Edit/5
         public ActionResult Edit(int id)
         {
+            Question q = new Question();
+            bool allo = q.UpdateQuestion(88, "Edited Question", 1);
+            bool allo2 = q.UpdateAnswer(225, "Edited Answer", false);
             return View();
         }
 
@@ -140,6 +145,8 @@ namespace OrDragon.Controllers
         // GET: Question/Delete/5
         public ActionResult Delete(int id)
         {
+            Question q = new Question();
+            bool allo = q.DeleteQuestion(88);
             return View();
         }
 
