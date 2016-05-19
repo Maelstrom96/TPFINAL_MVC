@@ -98,6 +98,63 @@ namespace OrDragon.Models
                 con.Close();
             }
         }
+
+        public DataSet GetQuestionById(int ID)
+        {
+            DataSet data = new DataSet();
+            OracleConnection con = Database.GetConnection();
+            OracleCommand cmd = new OracleCommand("QUESTIONSPKG", con);
+            cmd.CommandText = "QUESTIONSPKG.GetQuestionById";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            OracleParameter Ref = new OracleParameter("Cur", OracleDbType.RefCursor);
+            Ref.Direction = ParameterDirection.ReturnValue;
+            cmd.Parameters.Add(Ref);
+
+            OracleParameter Id = new OracleParameter("Pid", OracleDbType.Int32);
+            Id.Value = ID;
+            Id.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(Id);
+
+            OracleDataAdapter adapt = new OracleDataAdapter(cmd);
+            con.Open();
+            adapt.Fill(data, "Question");
+            con.Close();
+            return data;
+        }
+
+        public bool DeleteQuestion(int ID)
+        {
+            try {
+                OracleConnection con = Database.GetConnection();
+                OracleCommand cmd = new OracleCommand("QUESTIONSPKG", con);
+                cmd.CommandText = "QUESTIONSPKG.DeleteQuestion";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                OracleParameter Id = new OracleParameter("PNumQuestion", OracleDbType.Int32);
+                Id.Value = ID;
+                Id.Direction = ParameterDirection.Input;
+                cmd.Parameters.Add(Id);
+
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        public bool UpadteQuestion(int Id, String question, int difficulty, 
+                                   string rep1, string rep2, string rep3, string rep4, int goodrep)
+        {
+            // TODO
+            OracleConnection con = Database.GetConnection();
+            OracleCommand cmd = new OracleCommand("QUESTIONPKG", con);
+            cmd.CommandText = "";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            return false;
+        }
     }
     public class QuestionAnswerViewModel
     {
