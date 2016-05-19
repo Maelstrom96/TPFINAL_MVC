@@ -144,16 +144,75 @@ namespace OrDragon.Models
                 return false;
             }
         }
-        public bool UpadteQuestion(int Id, String question, int difficulty, 
-                                   string rep1, string rep2, string rep3, string rep4, int goodrep)
+        public bool UpdateQuestion(int Id, String question, int difficulty)
         {
-            // TODO
+            try {
+                // TODO
+                OracleConnection con = Database.GetConnection();
+                OracleCommand cmd = new OracleCommand("QUESTIONPKG", con);
+                cmd.CommandText = "QUESTIONSPKG.UpdateQuestion";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                OracleParameter ID = new OracleParameter("PNumQuestion", OracleDbType.Int32);
+                ID.Direction = ParameterDirection.Input;
+                ID.Value = Id;
+                cmd.Parameters.Add(ID);
+
+                OracleParameter Question = new OracleParameter("PEnonce", OracleDbType.Varchar2);
+                Question.Direction = ParameterDirection.Input;
+                Question.Value = question;
+                cmd.Parameters.Add(Question);
+
+                OracleParameter Diff = new OracleParameter("PDiff", OracleDbType.Int32);
+                Diff.Direction = ParameterDirection.Input;
+                Diff.Value = difficulty;
+                cmd.Parameters.Add(Diff);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        public bool UpdateAnswer(int Id, String Rep, bool isTrue)
+        {
             OracleConnection con = Database.GetConnection();
-            OracleCommand cmd = new OracleCommand("QUESTIONPKG", con);
-            cmd.CommandText = "";
+            OracleCommand cmd = new OracleCommand("QUESTIONSPKG");
+            cmd.CommandText = "QUESTIONSPKG.UpdateAnswer";
             cmd.CommandType = CommandType.StoredProcedure;
 
-            return false;
+            OracleParameter ID = new OracleParameter("PNumReponse", OracleDbType.Int32);
+            ID.Direction = ParameterDirection.Input;
+            ID.Value = Id;
+            cmd.Parameters.Add(ID);
+
+            OracleParameter Answer = new OracleParameter("PReponse", OracleDbType.Varchar2);
+            Answer.Direction = ParameterDirection.Input;
+            Answer.Value = Rep;
+            cmd.Parameters.Add(Answer);
+
+            OracleParameter Flag = new OracleParameter("PFlag", OracleDbType.Int32);
+            Flag.Direction = ParameterDirection.Input;
+            if (isTrue) Flag.Value = 1;
+            else Flag.Value = 0;
+            cmd.Parameters.Add(Flag);
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
     }
     public class QuestionAnswerViewModel
