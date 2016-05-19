@@ -213,12 +213,13 @@ namespace OrDragon.Models
                 con.Open();
                 cmd.ExecuteNonQuery();
                 con.Close();
-                return true;
+            
             }
             catch (Exception e)
             {
                 return false;
             }
+            return true;
         }
     }
     public class QuestionAnswerViewModel
