@@ -6,26 +6,25 @@
     <button type="button" class="btn btn-default" data-dismiss="modal" id="q-add">Ajouter</button>
 </p>
 <div>
-    <table class="table">
+    <table class="table table-hover">
         <tr>
-            <th>
+            @*<th>
                 Question
             </th>
             <th>
                 Actions
-            </th>
+            </th>*@
         </tr>
 
         @foreach (Question item in questions.GetList())
         {
-            <tr>
+            <tr id="q_@item.Id" data-difficulty="@item.Difficulty" class="active-question">
                 <td>
-                    @item.Text
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    <div class="col-md-4 col-box">@item.Text</div>
+                    <div class="col-md-2 text-center col-box @{if (item.Answers[0].IsGood) {<text>alert-success</text>} else {<text>alert-danger</text>}}">@item.Answers[0].Text</div>
+                    <div class="col-md-2 text-center col-box @{if (item.Answers[1].IsGood) {<text>alert-success</text>} else {<text>alert-danger</text>}}">@item.Answers[1].Text</div>
+                    <div class="col-md-2 text-center col-box @{if (item.Answers[2].IsGood) {<text>alert-success</text>} else {<text>alert-danger</text>}}">@item.Answers[2].Text</div>
+                    <div class="col-md-2 text-center col-box @{if (item.Answers[3].IsGood) {<text>alert-success</text>} else {<text>alert-danger</text>}}">@item.Answers[3].Text</div>
                 </td>
             </tr>
         }
@@ -97,12 +96,47 @@
     </div>
 </div>
 
+<style>
+    .col-box {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border: 1px solid #ddd;
+        border: 1px solid rgba(86,61,124,.2);
+    }
+
+    .alert-success {
+        background-image: -webkit-linear-gradient(top,#dff0d8 0,#c8e5bc 100%);
+        background-image: -o-linear-gradient(top,#dff0d8 0,#c8e5bc 100%);
+        background-image: -webkit-gradient(linear,left top,left bottom,from(#dff0d8),to(#c8e5bc));
+        background-image: linear-gradient(to bottom,#dff0d8 0,#c8e5bc 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdff0d8', endColorstr='#ffc8e5bc', GradientType=0);
+        background-repeat: repeat-x;
+        border-color: #b2dba1;
+    }
+
+    .alert-danger {
+    background-image: -webkit-linear-gradient(top,#f2dede 0,#e7c3c3 100%);
+    background-image: -o-linear-gradient(top,#f2dede 0,#e7c3c3 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#f2dede),to(#e7c3c3));
+    background-image: linear-gradient(to bottom,#f2dede 0,#e7c3c3 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2dede', endColorstr='#ffe7c3c3', GradientType=0);
+    background-repeat: repeat-x;
+    border-color: #dca7a7;
+}
+}
+</style>
+
 <script>
+    var running = false;
     $("#create-nav").submit(function (e) {
         e.preventDefault();
     });
 
     $(document).ready(function () {
+        $(".active-question").hover(function () {
+            $(this).css('cursor', 'pointer');
+        });
+
         $("#q-add").click(function () {
             $('#add-modal').modal('show');
         });
@@ -111,9 +145,9 @@
             resetAddModal();
         });
 
-        var running = false;
         $("#btn-create").click(function () {
             if (running) return;
+            if ($('input[type=radio][name=isGood]:checked').attr('id') == undefined) return;
             if ($("#difficulty").val() > 3 || $("#difficulty").val() < 1) return;
             $("#add-message").html("En cour..");
             $("#add-message").removeClass().addClass("alert alert-info");
@@ -141,7 +175,7 @@
                     {
                         $("#add-message").html(status.Message);
                         $("#add-message").removeClass().addClass("alert alert-success");
-                        setTimeout('resetAddModal()', 750);
+                        setTimeout('location.reload();', 750);
                     }
                     else
                     {
@@ -151,6 +185,7 @@
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
+                    running = false;
                     $("#add-message").html(textStatus);
                 }
             });
@@ -175,5 +210,7 @@
           .removeAttr('selected')
           .not(':button, :submit, :reset, :hidden, :radio, :checkbox')
           .val('');
+
+        running = false
     }
 </script>
