@@ -3,7 +3,7 @@
 @{Questions questions = (Questions)HttpRuntime.Cache["questions"];}
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    <button type="button" class="btn btn-default" data-dismiss="modal" id="q-add">Ajouter</button>
 </p>
 <div>
     <table class="table">
@@ -32,3 +32,148 @@
 
     </table>
 </div>
+
+<div class="modal fade" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form class="form" data-toggle="validator" role="form" method="post" accept-charset="UTF-8" id="create-nav">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Ajouter une question</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div id="add-message"></div>
+                    <div class="form-group">
+                        <label class="sr-only" for="exampleInputQuestion">Question : </label>
+                        <input type="text" data-val="true" class="form-control" id="qtext" name="qtext" placeholder="Quelle est la pire marque de téléphone?" required>
+                    </div>
+                    <div class="form-group">
+                        <table>
+
+                            <tr>
+                                <td class="col-md-8" style="width:98%">
+                                    <input type="text" data-val="true" class="form-control" id="rep1" name="rep1" placeholder="Android" required>
+                                </td>
+                                <td><input type="radio" name="isGood" id="1" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep2" name="rep2" placeholder="Iphone" required>
+                                </td>
+                                <td><input type="radio" name="isGood" id="2" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep3" name="rep3" placeholder="Blackberry" required>
+                                </td>
+                                <td><input type="radio" name="isGood" id="3" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep4" name="rep4" placeholder="Windows phone" required>
+                                </td>
+                                <td><input type="radio" name="isGood" id="4" required /></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+
+                        <div>
+                            <input type="number" min="1" max="3" class="form-control" id="difficulty" name="difficulty" placeholder="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="close-add">Fermer</button>
+                    <button id="btn-create" type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#create-nav").submit(function (e) {
+        e.preventDefault();
+    });
+
+    $(document).ready(function () {
+        $("#q-add").click(function () {
+            $('#add-modal').modal('show');
+        });
+
+        $("#close-add").click(function () {
+            resetAddModal();
+        });
+
+        var running = false;
+        $("#btn-create").click(function () {
+            if (running) return;
+            if ($("#difficulty").val() > 3 || $("#difficulty").val() < 1) return;
+            $("#add-message").html("En cour..");
+            $("#add-message").removeClass().addClass("alert alert-info");
+
+            var data = {
+                "qtext": $("#qtext").val(),
+                "rep1": $("#rep1").val(),
+                "rep2": $("#rep2").val(),
+                "rep3": $("#rep3").val(),
+                "rep4": $("#rep4").val(),
+                "goodrep": $('input[type=radio][name=isGood]:checked').attr('id'),
+                "difficulty": $("#difficulty").val()
+
+            };
+
+            running = true;
+            $.ajax({
+                url: "/question/create",
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (status) {
+                    if (status.Success)
+                    {
+                        $("#add-message").html(status.Message);
+                        $("#add-message").removeClass().addClass("alert alert-success");
+                        setTimeout('resetAddModal()', 750);
+                    }
+                    else
+                    {
+                        running = false;
+                        $("#add-message").html(status.Message);
+                        $("#add-message").removeClass().addClass("alert alert-danger");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#add-message").html(textStatus);
+                }
+            });
+        });
+    });
+
+    function resetAddModal() {
+        $('#add-modal').modal('hide');
+        $("#add-message").html("");
+        $("#add-message").removeClass();
+
+        $("#qtext").val('');
+        $("#rep1").val('');
+        $("#rep2").val('');
+        $("#rep3").val('');
+        $("#rep4").val('');
+        $('input[type=radio][name=isGood]:checked').checked = false;
+        $("#difficulty").val('');
+
+        $(':input', '#create-nav')
+          .removeAttr('checked')
+          .removeAttr('selected')
+          .not(':button, :submit, :reset, :hidden, :radio, :checkbox')
+          .val('');
+    }
+</script>

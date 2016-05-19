@@ -27,5 +27,11 @@ namespace OrDragon
             map.StartListener();
             HttpRuntime.Cache["map"] = map;
         }
+
+        protected void Session_Start()
+        {
+            Questions q = (Questions)HttpRuntime.Cache["questions"];
+            q.Import();
+        }
     }
 }

@@ -60,6 +60,9 @@ namespace OrDragon.Controllers
         [HttpPost]
         public ActionResult Create(string qtext, string rep1, string rep2, string rep3, string rep4, int goodrep, ushort difficulty)
         {
+            ActionExecutingContext filterContext = new ActionExecutingContext();
+            LoginStatus status = new LoginStatus();
+
             Question q = new Question();
             q.Text = qtext;
             q.AddAnswer(new Answer(rep1, goodrep == 1));
@@ -68,15 +71,41 @@ namespace OrDragon.Controllers
             q.AddAnswer(new Answer(rep4, goodrep == 4));
             q.Difficulty = difficulty;
 
+            Questions qs = (Questions)HttpRuntime.Cache["questions"];
+
             try {
                 q.AddQuestionDB();
+                qs.GetList().Add(q);
 
+                status.Success = true;
+                status.Message = "La question à été ajouté avec succès";
+
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
             }
             catch (OracleException ex)            {
                 OracleExceptions.Parse(ex);
+                status.Message = ex.Message;
             }
 
-            return null;
+            status.Success = false;
+
+            filterContext.Result = new JsonResult
+            {
+                Data = status,
+                ContentEncoding = System.Text.Encoding.UTF8,
+                ContentType = "application/json",
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+
+            return filterContext.Result;
         }
 
         private int AnswerBoolToInt(bool answer)

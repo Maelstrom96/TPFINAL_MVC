@@ -44,39 +44,58 @@ namespace OrDragon.Models
         public void AddQuestionDB()
         {
             OracleConnection con = Database.GetConnection();
-            OracleCommand cmd = new OracleCommand("QuestionsPKG", con);
-            cmd.CommandText = "QuestionsPKG.CreateQuestion";
-            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            OracleTransaction trans = null;
 
-            OracleParameter Enonce = new OracleParameter("PEnoncer", OracleDbType.Varchar2);
-            Enonce.Value = Text;
-            Enonce.Direction = ParameterDirection.Input;
-            cmd.Parameters.Add(Enonce);
-
-            OracleParameter Diff = new OracleParameter("PDiff", OracleDbType.Int32);
-            Diff.Value = Difficulty;
-            Diff.Direction = ParameterDirection.Input;
-            cmd.Parameters.Add(Diff);
-
-            cmd.ExecuteNonQuery();
-
-            cmd.CommandText = "CreateAnswer";
-
-            Enonce = new OracleParameter("PReponse", OracleDbType.Varchar2);
-            Enonce.Direction = ParameterDirection.Input;
-
-            Diff = new OracleParameter("PFlag", OracleDbType.Int32);
-            Diff.Direction = ParameterDirection.Input;
-            for (int i = 0; i < Answers.Count; ++i)
+            try
             {
-                cmd.Parameters.Clear();
-                Enonce.Value = Answers[i].Text;
-                Diff.Value = Answers[i].Text;
+                trans = con.BeginTransaction(IsolationLevel.ReadCommitted);
 
+                OracleCommand cmd = new OracleCommand("QuestionsPKG", con);
+                cmd.CommandText = "QuestionsPKG.CreateQuestion";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                OracleParameter Enonce = new OracleParameter("PEnoncer", OracleDbType.Varchar2);
+                Enonce.Value = Text;
+                Enonce.Direction = ParameterDirection.Input;
                 cmd.Parameters.Add(Enonce);
+
+                OracleParameter Diff = new OracleParameter("PDiff", OracleDbType.Int32);
+                Diff.Value = Difficulty;
+                Diff.Direction = ParameterDirection.Input;
                 cmd.Parameters.Add(Diff);
 
                 cmd.ExecuteNonQuery();
+
+                cmd.CommandText = "QuestionsPKG.CreateAnswer";
+
+                Enonce = new OracleParameter("PReponse", OracleDbType.Varchar2);
+                Enonce.Direction = ParameterDirection.Input;
+
+                Diff = new OracleParameter("PFlag", OracleDbType.Int32);
+                Diff.Direction = ParameterDirection.Input;
+                for (int i = 0; i < Answers.Count; ++i)
+                {
+                    cmd.Parameters.Clear();
+                    Enonce.Value = Answers[i].Text;
+                    if (Answers[i].IsGood) Diff.Value = 1;
+                    else Diff.Value = 0;
+
+                    cmd.Parameters.Add(Enonce);
+                    cmd.Parameters.Add(Diff);
+
+                    cmd.ExecuteNonQuery();
+                }
+                trans.Commit();
+            }
+            catch (Exception e)
+            {
+                trans.Rollback();
+                throw e;
+            }
+            finally
+            {
+                con.Close();
             }
         }
     }
