@@ -13,9 +13,9 @@ namespace OrDragon.Controllers
         public ActionResult Index()
         {
             PlayerState p = new PlayerState();
-            p = p.Initialize();
+            p = PlayerState.Initialize();
             PlayersStates ps = new PlayersStates();
-            ps.list = ps.Initialize();
+            ps.list = PlayersStates.Initialize();
             return View();
         }
     }

@@ -112,7 +112,7 @@ namespace OrDragon.Models
         }
 
         // Returns a list of every teams states (items and buildings)
-        public List<PlayerState> Initialize()
+        public static List<PlayerState> Initialize()
         {
             List<PlayerState> array = new List<PlayerState>();
 
