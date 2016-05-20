@@ -178,6 +178,7 @@
     <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\MapHub.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
+    <Compile Include="Controllers\StateController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Exceptions\InvalidLoginException.cs" />
     <Compile Include="Exceptions\OracleExceptions.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Models\Game\Entity.cs" />
     <Compile Include="Models\Game\Map.cs" />
     <Compile Include="Models\Modal.cs" />
+    <Compile Include="Models\PlayerState.cs" />
     <Compile Include="Models\Questions.cs" />
     <Compile Include="Models\Security.cs" />
     <Compile Include="Models\Users.cs" />
@@ -257,6 +259,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Map\" />
+    <Folder Include="Views\State\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
