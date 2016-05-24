@@ -131,8 +131,9 @@ namespace OrDragon.Models
 
         public bool DeleteQuestion(int ID)
         {
+            OracleConnection con = Database.GetConnection();
             try {
-                OracleConnection con = Database.GetConnection();
+                con.Open();
                 OracleCommand cmd = new OracleCommand("QUESTIONSPKG", con);
                 cmd.CommandText = "QUESTIONSPKG.DeleteQuestion";
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -148,6 +149,10 @@ namespace OrDragon.Models
             catch (Exception e)
             {
                 return false;
+            }
+            finally
+            {
+                con.Close();
             }
         }
         public bool UpdateQuestion(int Id, String question, int difficulty)

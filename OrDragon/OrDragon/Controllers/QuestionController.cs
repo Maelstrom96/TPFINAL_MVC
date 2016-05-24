@@ -142,28 +142,46 @@ namespace OrDragon.Controllers
             }
         }
 
-        // GET: Question/Delete/5
+        // TODO : AUTH!
+        [HttpPost]
         public ActionResult Delete(int id)
         {
+            if (Session[])
+
+            ActionExecutingContext filterContext = new ActionExecutingContext();
+            LoginStatus status = new LoginStatus();
+            Questions qs = (Questions)HttpRuntime.Cache["questions"];
             Question q = new Question();
-            bool allo = q.DeleteQuestion(88);
-            return View();
-        }
+            bool NoError = q.DeleteQuestion(id);
 
-        // POST: Question/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
+            if (NoError)
             {
-                // TODO: Add delete logic here
+                if (qs.GetList().Remove(qs.GetList().Single(s => s.Id == id)))
+                {
+                    status.Success = true;
+                    status.Message = "La question à été supprimé avec succès!";
+                }
+                else
+                {
+                    status.Success = false;
+                    status.Message = "La question a déjà été supprimé.";
+                }
+            }
+            else
+            {
+                status.Success = false;
+                status.Message = "Une erreur c'est produite, la question a peut-être déjà été supprimé.";
+            }
 
-                return RedirectToAction("Index");
-            }
-            catch
+            filterContext.Result = new JsonResult
             {
-                return View();
-            }
+                Data = status,
+                ContentEncoding = System.Text.Encoding.UTF8,
+                ContentType = "application/json",
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+
+            return filterContext.Result;
         }
     }
 }
