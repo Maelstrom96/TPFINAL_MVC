@@ -255,6 +255,7 @@
     <Content Include="Views\Shared\_Modal.cshtml" />
     <Content Include="Views\Question\index.cshtml" />
     <Content Include="Views\Question\Create.cshtml" />
+    <Content Include="Views\User\Manage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
