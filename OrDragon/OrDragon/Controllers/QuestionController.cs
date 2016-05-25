@@ -65,6 +65,22 @@ namespace OrDragon.Controllers
             ActionExecutingContext filterContext = new ActionExecutingContext();
             LoginStatus status = new LoginStatus();
 
+            if ((User)Session["User"] == null)
+            {
+                status.Success = false;
+                status.Message = "Vous n'avez pas l'autorisation d'éffectuer cette action.";
+
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
+            }
+
             Question q = new Question();
             q.Text = qtext;
             q.AddAnswer(new Answer(rep1, goodrep == 1));
