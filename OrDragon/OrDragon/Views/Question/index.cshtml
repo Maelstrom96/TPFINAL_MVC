@@ -6,7 +6,7 @@
     <button type="button" class="btn btn-default" data-dismiss="modal" id="q-add">Ajouter</button>
 </p>
 <div>
-    <table class="table table-hover">
+    <table id="qtable" class="table table-hover">
         <tr>
             @*<th>
                 Question
@@ -96,6 +96,12 @@
     </div>
 </div>
 
+<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none">
+    <li><a tabindex="-1" href="#">Modifier</a></li>
+    <li class="divider"></li>
+    <li><a tabindex="-1" href="#">Supprimer</a></li>
+</ul>
+
 <style>
     .col-box {
         padding-top: 15px;
@@ -127,6 +133,134 @@
 </style>
 
 <script>
+    /* Code for right click menu */
+    (function ($, window) {
+
+        $.fn.contextMenu = function (settings) {
+
+            return this.each(function () {
+
+                // Open context menu
+                $(this).on("contextmenu", function (e) {
+                    // return native menu if pressing control
+                    if (e.ctrlKey) return;
+
+                    //open menu
+                    var $menu = $(settings.menuSelector)
+                        .data("invokedOn", $(e.target))
+                        .show()
+                        .css({
+                            position: "absolute",
+                            left: getMenuPosition(e.clientX, 'width', 'scrollLeft'),
+                            top: getMenuPosition(e.clientY, 'height', 'scrollTop')
+                        })
+                        .off('click')
+                        .on('click', 'a', function (e) {
+                            $menu.hide();
+
+                            var $invokedOn = $menu.data("invokedOn");
+                            var $selectedMenu = $(e.target);
+
+                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+                        });
+
+                    return false;
+                });
+
+                // Open context menu
+                $(this).click("contextmenu", function (e) {
+                    // return native menu if pressing control
+                    if (e.ctrlKey) return;
+
+                    //open menu
+                    var $menu = $(settings.menuSelector)
+                        .data("invokedOn", $(e.target))
+                        .show()
+                        .css({
+                            position: "absolute",
+                            left: getMenuPosition(e.clientX, 'width', 'scrollLeft'),
+                            top: getMenuPosition(e.clientY, 'height', 'scrollTop')
+                        })
+                        .off('click')
+                        .on('click', 'a', function (e) {
+                            $menu.hide();
+
+                            var $invokedOn = $menu.data("invokedOn");
+                            var $selectedMenu = $(e.target);
+
+                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+                        });
+
+                    return false;
+                });
+
+                //make sure menu closes on any click
+                $('body').click(function () {
+                    $(settings.menuSelector).hide();
+                });
+            });
+
+            function getMenuPosition(mouse, direction, scrollDir) {
+                var win = $(window)[direction](),
+                    scroll = $(window)[scrollDir](),
+                    menu = $(settings.menuSelector)[direction](),
+                    position = mouse + scroll;
+
+                // opening menu would pass the side of the page
+                if (mouse + menu > win && menu < mouse)
+                    position -= menu;
+
+                return position;
+            }
+
+        };
+    })(jQuery, window);
+
+    function getQuestionId(text) {
+        return text.replace('q_', '');
+    }
+
+    $("#qtable td").contextMenu({
+        menuSelector: "#contextMenu",
+        menuSelected: function (invokedOn, selectedMenu) {
+            if (selectedMenu.text() == "Supprimer") {
+                if(confirm("Êtes-vous certain de vouloir supprimer cette question?")) {
+                    // Delete question
+                    var data = {
+                        "id": getQuestionId(invokedOn.closest('tr')[0].id)
+                    };
+
+                    $.ajax({
+                        url: "/question/delete",
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function (status) {
+                            if (status.Success) {
+                                invokedOn.closest('tr')[0].remove();
+                            }
+                            else {
+                                alert(status.Message);
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $("#log-message").html(textStatus);
+                        }
+                    });
+                }
+            }
+            /*
+            var qtr = invokedOn.closest('tr');
+            var msg = "You selected the menu item '" + selectedMenu.text() +
+                "' on the value '" + invokedOn.text() + "'";
+            var msg2 = "\ L'id de la question est : " + qtr[0].id;
+            alert(msg + msg2);
+            */
+        }
+    });
+    /* End of right click menu */
+
     var running = false;
     $("#create-nav").submit(function (e) {
         e.preventDefault();

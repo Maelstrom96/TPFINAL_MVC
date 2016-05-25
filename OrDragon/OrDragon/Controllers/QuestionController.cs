@@ -146,8 +146,6 @@ namespace OrDragon.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            if (Session[])
-
             ActionExecutingContext filterContext = new ActionExecutingContext();
             LoginStatus status = new LoginStatus();
             Questions qs = (Questions)HttpRuntime.Cache["questions"];
