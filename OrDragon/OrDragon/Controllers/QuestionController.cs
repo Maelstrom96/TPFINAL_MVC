@@ -164,6 +164,19 @@ namespace OrDragon.Controllers
         {
             ActionExecutingContext filterContext = new ActionExecutingContext();
             LoginStatus status = new LoginStatus();
+            if ((User)Session["User"] == null)
+            {
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
+            }
+
             Questions qs = (Questions)HttpRuntime.Cache["questions"];
             Question q = new Question();
             bool NoError = q.DeleteQuestion(id);
