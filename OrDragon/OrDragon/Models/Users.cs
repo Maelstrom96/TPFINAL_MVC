@@ -40,6 +40,39 @@ namespace OrDragon.Models
 
     }
 
+    public class ModifyUserViewModel
+    {
+        public int Id { get; set; }
+
+        [Display(Name = "Nom d'usager")]
+        [Required]
+        [StringLength(50)]
+        public String Username { get; set; }
+
+        [Display(Name = "Prénom")]
+        [Required]
+        public String Name { get; set; }
+
+        [Display(Name = "Nom")]
+        [Required]
+        public String Lastname { get; set; }
+        
+        [DataType(DataType.Password)]
+        [Display(Name = "Ancien Mot de passe")]
+        public String OldPassword { get; set; }
+
+        [StringLength(50, ErrorMessage = "La chaîne {0} doit comporter au moins {2} caractères.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Mot de passe")]
+        public String Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirmer le mot de passe")]
+        [Compare("Password", ErrorMessage = "Le mot de passe et celui de confirmation ne correspondent pas.")]
+        public string ConfirmPassword { get; set; }
+    }
+
+
     public class LoginStatus
     {
         public bool Success { get; set; }

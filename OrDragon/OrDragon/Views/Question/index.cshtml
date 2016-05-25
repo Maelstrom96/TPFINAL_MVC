@@ -1,10 +1,15 @@
 ﻿@using OrDragon.Models;
 @model IEnumerable<OrDragon.Models.Question>
-@{Questions questions = (Questions)HttpRuntime.Cache["questions"];}
+@{
+    Questions questions = (Questions)HttpRuntime.Cache["questions"];
+    OrDragon.Models.User user = (OrDragon.Models.User)Session["user"];
+}
 
-<p>
-    <button type="button" class="btn btn-default" data-dismiss="modal" id="q-add">Ajouter</button>
-</p>
+@{if (user != null) { 
+    <p>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="q-add">Ajouter</button>
+    </p>
+}}
 <div>
     <table id="qtable" class="table table-hover">
         <tr>

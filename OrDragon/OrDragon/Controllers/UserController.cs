@@ -132,5 +132,14 @@ namespace OrDragon.Controllers
             }
             return RedirectToAction("Index", "Home"); // Send user to index
         }
+        public ActionResult Manage()
+        {
+            if ((User)Session["User"] != null)
+            {
+                return View();
+            }
+            else
+                return RedirectToAction("Index", "Home"); // Send user to index
+        }
 	}
 }
