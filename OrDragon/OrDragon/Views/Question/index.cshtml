@@ -101,6 +101,70 @@
     </div>
 </div>
 
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form class="form" data-toggle="validator" role="form" method="post" accept-charset="UTF-8" id="edit-nav">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modifier une question</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div id="edit-message"></div>
+                    <div class="form-group">
+                        <label class="sr-only" for="exampleInputQuestion">Question : </label>
+                        <input type="text" data-val="true" class="form-control" id="qtextedit" name="qtext" placeholder="Quelle est la pire marque de téléphone?" required>
+                    </div>
+                    <div class="form-group">
+                        <table>
+
+                            <tr>
+                                <td class="col-md-8" style="width:98%">
+                                    <input type="text" data-val="true" class="form-control" id="rep1edit" name="rep1" placeholder="Android" required>
+                                </td>
+                                <td><input type="radio" name="isGoodedit" id="edit1" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep2edit" name="rep2" placeholder="Iphone" required>
+                                </td>
+                                <td><input type="radio" name="isGoodedit" id="edit2" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep3edit" name="rep3" placeholder="Blackberry" required>
+                                </td>
+                                <td><input type="radio" name="isGoodedit" id="edit3" required /></td>
+                            </tr>
+
+                            <tr>
+                                <td class="col-md-8">
+                                    <input type="text" data-val="true" class="form-control" id="rep4edit" name="rep4" placeholder="Windows phone" required>
+                                </td>
+                                <td><input type="radio" name="isGoodedit" id="edit4" required /></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+
+                        <div>
+                            <input type="number" min="1" max="3" class="form-control" id="editdifficulty" name="difficulty" placeholder="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="close-add">Fermer</button>
+                    <button id="btn-edit" type="submit" class="btn btn-primary">Modifier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none">
     <li><a tabindex="-1" href="#">Modifier</a></li>
     <li class="divider"></li>
@@ -225,6 +289,7 @@
         return text.replace('q_', '');
     }
 
+    var editvalue;
     $("#qtable td").contextMenu({
         menuSelector: "#contextMenu",
         menuSelected: function (invokedOn, selectedMenu) {
@@ -255,6 +320,26 @@
                     });
                 }
             }
+            else if (selectedMenu.text() == "Modifier") {
+                var tds = invokedOn.closest('td');
+                var tr = invokedOn.closest('tr')[0];
+
+                editvalue = getQuestionId(tr.id);
+
+                $("#qtextedit").val(tds[0].children[0].textContent);
+                $("#rep1edit").val(tds[0].children[1].textContent);
+                $("#rep2edit").val(tds[0].children[2].textContent);
+                $("#rep3edit").val(tds[0].children[3].textContent);
+                $("#rep4edit").val(tds[0].children[4].textContent);
+                $("#editdifficulty").val($(tr).attr("data-difficulty"));
+
+                if ($(tds[0].children[1]).hasClass("alert-success")) $("#edit1").prop("checked", true);
+                if ($(tds[0].children[2]).hasClass("alert-success")) $("#edit2").prop("checked", true);
+                if ($(tds[0].children[3]).hasClass("alert-success")) $("#edit3").prop("checked", true);
+                if ($(tds[0].children[4]).hasClass("alert-success")) $("#edit4").prop("checked", true);
+
+                $('#edit-modal').modal('show');
+            }
             /*
             var qtr = invokedOn.closest('tr');
             var msg = "You selected the menu item '" + selectedMenu.text() +
@@ -271,7 +356,55 @@
         e.preventDefault();
     });
 
+    $("#edit-nav").submit(function (e) {
+        e.preventDefault();
+    });
+
     $(document).ready(function () {
+        $("#btn-edit").click(function () {
+            if ($('input[type=radio][name=isGoodedit]:checked').attr('id') == undefined) return;
+            if ($("#editdifficulty").val() > 3 || $("#editdifficulty").val() < 1) return;
+            $("#edit-message").html("En cour..");
+            $("#edit-message").removeClass().addClass("alert alert-info");
+
+            var data = {
+                "id" : editvalue,
+                "qtext": $("#qtextedit").val(),
+                "rep1": $("#rep1edit").val(),
+                "rep2": $("#rep2edit").val(),
+                "rep3": $("#rep3edit").val(),
+                "rep4": $("#rep4edit").val(),
+                "goodrep": $('input[type=radio][name=isGoodedit]:checked').attr('id').replace('edit', ''),
+                "difficulty": $("#editdifficulty").val()
+            };
+
+            $.ajax({
+                url: "/question/Edit",
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (status) {
+                    if (status.Success)
+                    {
+                        $("#edit-message").html(status.Message);
+                        $("#edit-message").removeClass().addClass("alert alert-success");
+                        setTimeout('location.reload();', 750);
+                    }
+                    else
+                    {
+                        running = false;
+                        $("#edit-message").html(status.Message);
+                        $("#edit-message").removeClass().addClass("alert alert-danger");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    running = false;
+                    $("#edit-message").html(textStatus);
+                }
+            });
+        });
+
         $(".active-question").hover(function () {
             $(this).css('cursor', 'pointer');
         });

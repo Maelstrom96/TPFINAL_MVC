@@ -193,7 +193,7 @@ namespace OrDragon.Models
         public bool UpdateAnswer(int Id, String Rep, bool isTrue)
         {
             OracleConnection con = Database.GetConnection();
-            OracleCommand cmd = new OracleCommand("QUESTIONSPKG");
+            OracleCommand cmd = new OracleCommand("QUESTIONSPKG", con);
             cmd.CommandText = "QUESTIONSPKG.UpdateAnswer";
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -251,20 +251,23 @@ namespace OrDragon.Models
         [Display(Name="Réponse")]
         public String Text { get; set; }
         public bool IsGood { get; set; }
+        public int Id { get; set; }
 
         public Answer()
         {
 
         }
-        public Answer(String text, int isGood)
+        public Answer(String text, int isGood, int id = 0)
         {
+            Id = id;
             Text = text;
             if (isGood == 0) IsGood = false;
             else IsGood = true;
         }
 
-        public Answer(String text, bool isGood_)
+        public Answer(String text, bool isGood_, int id = 0)
         {
+            Id = id;
             Text = text;
             IsGood = isGood_;
         }
@@ -307,12 +310,12 @@ namespace OrDragon.Models
                     {
                         if (currentQuestion != null) questions.Add(currentQuestion);
                         currentQuestion = new Question(Oraread.GetInt32(0), Oraread.GetString(1), Oraread.GetInt32(2));
-                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4)));
+                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4), Oraread.GetInt32(5)));
                         tempQuestionID = currentQuestion.Id;
                     }
                     else
                     {
-                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4)));
+                        currentQuestion.AddAnswer(new Answer(Oraread.GetString(3), Oraread.GetInt32(4), Oraread.GetInt32(5)));
                     }
                 }
 

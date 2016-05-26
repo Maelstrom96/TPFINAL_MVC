@@ -60,6 +60,117 @@ namespace OrDragon.Controllers
         }
 
         [HttpPost]
+        public ActionResult Edit(int id, string qtext, string rep1, string rep2, string rep3, string rep4, int goodrep, ushort difficulty)
+        {
+            String[] reps = new String[4];
+
+            reps[0] = rep1;
+            reps[1] = rep2;
+            reps[2] = rep3;
+            reps[3] = rep4;
+
+            ActionExecutingContext filterContext = new ActionExecutingContext();
+            LoginStatus status = new LoginStatus();
+            Questions qs = (Questions)HttpRuntime.Cache["questions"];
+
+            if ((User)Session["User"] == null)
+            {
+                status.Success = false;
+                status.Message = "Vous n'avez pas l'autorisation d'éffectuer cette action.";
+
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
+            }
+
+            try
+            {
+                if (id == null) throw new Exception();
+                if (qtext == null) throw new Exception();
+                if (rep1 == null) throw new Exception();
+                if (rep2 == null) throw new Exception();
+                if (rep3 == null) throw new Exception();
+                if (rep4 == null) throw new Exception();
+                if (goodrep == null) throw new Exception();
+                if (difficulty == null) throw new Exception();
+            }
+            catch(Exception ex) {
+                status.Success = false;
+                status.Message = "Un des paramètre demandé est vide.";
+
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
+            }
+
+            Question q = qs.GetList().Where(i => i.Id == id).First();
+            if (q == null)
+            {
+                status.Success = false;
+                status.Message = "La question n'a pas été trouvé dans la BD.";
+
+                filterContext.Result = new JsonResult
+                {
+                    Data = status,
+                    ContentEncoding = System.Text.Encoding.UTF8,
+                    ContentType = "application/json",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+
+                return filterContext.Result;
+            }
+
+            if (q.UpdateQuestion(q.Id, qtext, difficulty))
+            {
+                q.Text = qtext;
+                q.Difficulty = difficulty;
+            }
+
+            bool error = false;
+            for (int i = 1; i <= 4; i++ )
+            {
+                if (q.UpdateAnswer(q.Answers[i - 1].Id, reps[i - 1], i == goodrep))
+                {
+                    q.Answers[i - 1].Text = reps[i - 1];
+                    q.Answers[i - 1].IsGood = i == goodrep;
+                }
+                else error = true;
+            }
+
+            if (!error) 
+            {
+                status.Success = true;
+                status.Message = "La question a été modifier!";
+            }
+            else
+            {
+                status.Success = false;
+                status.Message = "Une erreur c'est produite : la question n'a pas été modifié";
+            }
+            filterContext.Result = new JsonResult
+            {
+                Data = status,
+                ContentEncoding = System.Text.Encoding.UTF8,
+                ContentType = "application/json",
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+
+            return filterContext.Result;
+        }
+
+        [HttpPost]
         public ActionResult Create(string qtext, string rep1, string rep2, string rep3, string rep4, int goodrep, ushort difficulty)
         {
             ActionExecutingContext filterContext = new ActionExecutingContext();
@@ -93,7 +204,6 @@ namespace OrDragon.Controllers
 
             try {
                 q.AddQuestionDB();
-                qs.GetList().Add(q);
 
                 status.Success = true;
                 status.Message = "La question à été ajouté avec succès";
@@ -105,7 +215,7 @@ namespace OrDragon.Controllers
                     ContentType = "application/json",
                     JsonRequestBehavior = JsonRequestBehavior.AllowGet
                 };
-
+                qs.Import();
                 return filterContext.Result;
             }
             catch (OracleException ex)            {
@@ -133,32 +243,6 @@ namespace OrDragon.Controllers
             return 0;
         }
 
-        // GET: Question/Edit/5
-        public ActionResult Edit(int id)
-        {
-            Question q = new Question();
-            bool allo = q.UpdateQuestion(88, "Edited Question", 1);
-            bool allo2 = q.UpdateAnswer(225, "Edited Answer", false);
-            return View();
-        }
-
-        // POST: Question/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // TODO : AUTH!
         [HttpPost]
         public ActionResult Delete(int id)
         {
