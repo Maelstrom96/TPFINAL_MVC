@@ -9,6 +9,8 @@
     <canvas id="canvas"></canvas>
 </div>
 
+<table id="playersstats" class="table table-bordered table-striped"></table>
+
 <style>
     .container {
         max-width: 2000px !important;
@@ -20,6 +22,128 @@
 </style>
 
 <script>
+    // STATS TABLE //
+    $(document).ready(function () {
+        InitTable();
+        setInterval(InitTable, 2000);
+    });
+
+    function InitTable() {
+        $.getJSON("/Stats/GetStats", function (result) {
+            var oldTable = document.getElementById('playersstats'),
+            newTable = oldTable.cloneNode();
+
+            // Insert Header
+            var thead = document.createElement('thead');
+            var trhead = document.createElement('tr');
+
+            var thA = document.createElement('th');
+            thA.appendChild(document.createTextNode("Alias"));
+            thA.className = "col-md-6";
+            trhead.appendChild(thA);
+
+            var thCu = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/Coin.png";
+            img.title = "Pièce d'or";
+            thCu.appendChild(img);
+            thCu.className = "col-md-1 text-center";
+            trhead.appendChild(thCu);
+
+            var thDo = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/Doritos.png";
+            img.title = "Dorritos";
+            thDo.appendChild(img);
+            thDo.className = "col-md-1 text-center";
+            trhead.appendChild(thDo);
+
+            var thDe = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/MountainDew.png";
+            img.title = "Mountain Dew";
+            thDe.appendChild(img);
+            thDe.className = "col-md-1 text-center";
+            trhead.appendChild(thDe);
+
+            var thI = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/Auberge.png";
+            img.title = "Auberge";
+            thI.appendChild(img);
+            thI.className = "col-md-1 text-center";
+            trhead.appendChild(thI);
+
+            var thM = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/Manoir.png";
+            img.title = "Manoir";
+            thM.appendChild(img);
+            thM.className = "col-md-1 text-center";
+            trhead.appendChild(thM);
+
+            var thCa = document.createElement('th');
+            var img = document.createElement('img');
+            img.src = "/Content/Images/Chateau.png";
+            img.title = "Chateau";
+            thCa.appendChild(img);
+            thCa.className = "col-md-1 text-center";
+            trhead.appendChild(thCa);
+
+            thead.appendChild(trhead);
+            newTable.appendChild(thead);
+
+            // Insert data
+            var tbody = document.createElement("tbody");
+            for (var i = 0; i < result.length; i++) {
+                var tr = document.createElement('tr');
+
+                var tdA = document.createElement('td');
+                tdA.appendChild(document.createTextNode(result[i].Alias));
+                tdA.className = "col-md-6";
+                tr.appendChild(tdA);
+
+                var tdCu = document.createElement('td');
+                tdCu.appendChild(document.createTextNode(result[i].Currency));
+                tdCu.className = "col-md-1 text-center";
+                tr.appendChild(tdCu);
+
+                var tdDo = document.createElement('td');
+                tdDo.appendChild(document.createTextNode(result[i].Dorritos));
+                tdDo.className = "col-md-1 text-center";
+                tr.appendChild(tdDo);
+
+                var tdDe = document.createElement('td');
+                tdDe.appendChild(document.createTextNode(result[i].Dew));
+                tdDe.className = "col-md-1 text-center";
+                tr.appendChild(tdDe);
+
+                var tdI = document.createElement('td');
+                tdI.appendChild(document.createTextNode(result[i].Inn));
+                tdI.className = "col-md-1 text-center";
+                tr.appendChild(tdI);
+
+                var tdM = document.createElement('td');
+                tdM.appendChild(document.createTextNode(result[i].Manor));
+                tdM.className = "col-md-1 text-center";
+                tr.appendChild(tdM);
+
+                var tdCa = document.createElement('td');
+                tdCa.appendChild(document.createTextNode(result[i].Castle));
+                tdCa.className = "col-md-1 text-center";
+                tr.appendChild(tdCa);
+
+                tbody.appendChild(tr);
+            }
+            newTable.appendChild(tbody);
+            
+            console.log("Updated stats table");
+            oldTable.parentNode.replaceChild(newTable, oldTable);
+        });
+
+    }
+    // END STATS TABLE //
+
     var stage;
     var bg;
     var noeuds;
@@ -28,7 +152,7 @@
 
     // Defining a connection to the server hub.
     var myHub = $.connection.mapHub;
-    $.connection.hub.logging = true;
+    $.connection.hub.logging = false;
     var queue = new createjs.LoadQueue();
 
     queue.loadFile({ src: "/Content/Images/Joueur.png", id:"J"});
@@ -53,8 +177,6 @@
 
             entities = new Array();
             entities = message;
-
-            console.log(entities);
 
             for (var i in entities) {
                 var image = queue.getResult(entities[i].Name);
@@ -89,8 +211,6 @@
     function init() {
         stage = new createjs.Stage("canvas");
         stage.enableMouseOver();
-        stage.canvas.width = 1600;
-        stage.canvas.height = 900;
 
         bg = new createjs.Bitmap("http://prog101.com/travaux/dragon/images/nowhereland.png");
         stage.addChild(bg);
@@ -111,7 +231,6 @@
         noeuds = new Array();
         $.getJSON("/Map/GetChemins", function (result) {
             chemins = result;
-            console.log(chemins);
 
             for (var i in chemins) {
                 var ligne_chemin = new createjs.Shape();
@@ -134,7 +253,6 @@
         noeuds = new Array();
         $.getJSON("/Map/GetNoeuds", function (result) {
             noeuds = result;
-            console.log(noeuds);
 
             for (var i in noeuds) {
                 var circle_noeud = new createjs.Graphics();

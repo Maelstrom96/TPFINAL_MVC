@@ -8,10 +8,10 @@ using System.Web;
 
 namespace OrDragon.Models
 {
-    public class PlayerState
+    public class PlayerStats
     {
         [Display(Name = "Équipe")]
-        String Alias;
+        public String Alias;
         [Display(Name = "Monnaie")]
         public int Currency;
         public int Dorritos;
@@ -23,8 +23,9 @@ namespace OrDragon.Models
         [Display(Name = "Châteaux")]
         public int Castle;
 
-        public PlayerState()
+        public PlayerStats()
         {
+            Alias = "";
             Currency = 0;
             Dorritos = 0;
             Dew = 0;
@@ -32,7 +33,7 @@ namespace OrDragon.Models
             Manor = 0;
             Castle = 0;
         }
-        public PlayerState(String Name, int Cash, int Chip, int Soda, int House, int Bighouse, int BiggerHouse)
+        public PlayerStats(String Name, int Cash, int Chip, int Soda, int House, int Bighouse, int BiggerHouse)
         {
             if (Name == null)
                 Alias = "LesDieuxGrec";
@@ -47,9 +48,9 @@ namespace OrDragon.Models
         }
 
         // initialze our Team PlayerState, (All the team's items and buildings)
-        public static PlayerState Initialize()
+        public static PlayerStats Initialize()
         {
-            PlayerState state = new PlayerState();
+            PlayerStats state = new PlayerStats();
             OracleConnection con = Database.GetConnection();
             OracleCommand cmd = new OracleCommand("PLAYERSPKG", con);
             cmd.CommandText = "PLAYERSPKG.GetAvoirTeam";
@@ -102,19 +103,19 @@ namespace OrDragon.Models
             return state;
         }
     }
-    public class PlayersStates
+    public class PlayersStats
     {
-        public List<PlayerState> list;
+        public List<PlayerStats> list;
 
-        public PlayersStates()
+        public PlayersStats()
         {
             list = Initialize();
         }
 
         // Returns a list of every teams states (items and buildings)
-        public static List<PlayerState> Initialize()
+        public static List<PlayerStats> Initialize()
         {
-            List<PlayerState> array = new List<PlayerState>();
+            List<PlayerStats> array = new List<PlayerStats>();
 
             OracleConnection con = Database.GetConnection();
 
@@ -151,7 +152,7 @@ namespace OrDragon.Models
 
                 if (Reading)
                 {
-                    array.Add(new PlayerState(items.GetString(0), items.GetInt32(3), items.GetInt32(2), items.GetInt32(1), buildings.GetInt32(1), buildings.GetInt32(2), buildings.GetInt32(3)));
+                    array.Add(new PlayerStats(items.GetString(0), items.GetInt32(3), items.GetInt32(2), items.GetInt32(1), buildings.GetInt32(1), buildings.GetInt32(2), buildings.GetInt32(3)));
                 }
             }
             con.Close();

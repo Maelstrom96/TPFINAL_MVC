@@ -178,7 +178,7 @@
     <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\MapHub.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
-    <Compile Include="Controllers\StateController.cs" />
+    <Compile Include="Controllers\StatsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Exceptions\InvalidLoginException.cs" />
     <Compile Include="Exceptions\OracleExceptions.cs" />
